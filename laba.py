@@ -6,8 +6,7 @@ from PyQt5.QtCore import pyqtSlot, QTimer
 from PyQt5.QtGui import QPixmap, QImage
 from PyQt5.QtWidgets import QDialog, QApplication, QLineEdit, QInputDialog
 from PyQt5.uic import loadUi
-#creating dataset id
-#id = input('Enter user id : ')
+import sqlite3
 
 class lib400(QDialog):
     def __init__(self):
@@ -19,7 +18,36 @@ class lib400(QDialog):
         self.detectButton.toggled.connect(self.detect_webcam_face)
         self.face_Enabled = False
         self.faceCascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
-        self.id, ok = QInputDialog.getInt(None, 'id', 'Enter your Id: ')
+        self.id, ok = QInputDialog.getInt(None, 'id', 'Enter Id: ')
+        self.regno, ok = QInputDialog.getText(None, 'Registration Number', 'Enter Students Registration number: ')
+        self.name, ok = QInputDialog.getText(None, 'name', 'Enter Students Name: ')
+        self.nationality, ok = QInputDialog.getText(None, 'Nationality', 'Enter Students Nationality: ')
+        self.college, ok = QInputDialog.getText(None, 'College or School', 'Enter Students College Name: ')
+        self.course, ok = QInputDialog.getText(None, 'Program or Course', 'Enter Students Course: ')
+        self.year, ok = QInputDialog.getText(None, 'Year and Semester', 'Enter Students Year and Semester: ')
+
+        self.connection = sqlite3.connect("library.db")
+
+        self.insertIntoDb()
+
+    def insertIntoDb(self):
+        self.cusor = self.connection.cursor()
+        self.cusor.execute('''CREATE TABLE IF NOT EXISTS students(Id INTEGER , RegNo TEXT , Name TEXT,
+                            Nationality TEXT, College TEXT, Course TEXT, Year TEXT)''')
+        self.cusor.execute('SELECT * FROM students WHERE Id = "str(self.id)"')
+        isRecordExist = 0
+        for row in self.cusor:
+            isrecordExist = 1
+        if (isRecordExist == 1):
+            self.cusor.execute('''UPDATE student SET RegNo ="+self.regno+", Name="+self.name+",
+             Nationality="+self.nationality+", College="+self.college+", Course="+self.course+", Year="+self.year+"
+              WHERE Id=?, (str(self.id)) ''')
+        else:
+            self.cusor.execute('''INSERT INTO students(Id, RegNo, Name, Nationality, College, Course, Year)
+            VALUES(?,?,?,?,?,?,?)''', (self.id, self.regno, self.name, self.nationality, self.college, self.course, self.year))
+        self.connection.commit()
+        self.connection.close()
+
 
     def detect_webcam_face(self, status):
         if status:

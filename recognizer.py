@@ -6,6 +6,7 @@ from PyQt5.QtCore import pyqtSlot, QTimer
 from PyQt5.QtGui import QPixmap, QImage
 from PyQt5.QtWidgets import QDialog, QApplication, QLineEdit, QInputDialog
 from PyQt5.uic import loadUi
+import sqlite3
 
 class lib400(QDialog):
     def __init__(self):
@@ -20,6 +21,21 @@ class lib400(QDialog):
         self.face_Enabled = False
         self.faceCascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
         self.id =0
+
+        self.connection = sqlite3.connect("library.db")
+
+        self.getdata()
+
+    def getdata(self):
+        cmd = "SELECT * FROM students"
+        cursor = self.connection.execute(cmd)
+        print(cursor.fetchone())
+        data = None
+        for row in cursor:
+            data = row
+        return data
+        self.detect_face(data)
+
 
     def detect_webcam_face(self, status):
         if status:
@@ -56,13 +72,27 @@ class lib400(QDialog):
     def detect_face(self, img):
         self.rec.read('recognizer/tranningData.yml')
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        faces = self.faceCascade.detectMultiScale(gray, 1.3, 5, minSize=(90,90))
+        faces = self.faceCascade.detectMultiScale(gray, 1.2, 5, minSize=(90,90))
 
         for(x,y,w,h) in faces:
             cv2.rectangle(img, (x,y), (x+w, y+h), (0,0,255),2)
             self.id, conf = self.rec.predict(gray[y:y + h, x:x + w])
-            cv2.putText(img, str(self.id), (x, y + h + 30), self.font, 2, (0, 0, 255), 2)
+            data = self.getdata()
+            if data != None:
+                if Id in data4 == 87:
+                    cv2.putText(img, str(data[2]), (x, y + h + 30), self.font, 2, (0, 0, 255), 2)
+                    cv2.putText(img, str(data[1]), (x, y + h + 30), self.font, 2, (0, 0, 255), 2)
+                    cv2.putText(img, str(data[3]), (x, y + h + 30), self.font, 2, (0, 0, 255), 2)
+                elif Id == 45:
+                    self.id = "matama"
+                    cv2.putText(img, str(data[1]), (x, y + h + 30), self.font, 2, (0, 0, 255), 2)
+                # else:
+                #     self.id = "unknown face"
+                #     cv2.putText(img, str(self.id), (x, y + h + 30), self.font, 2, (0, 0, 255), 2)
+            else:
+                continue
         return img
+        self.connection.close()
 
     def displayImage(self, img, window=2):
         qformat = QImage.Format_Indexed8
