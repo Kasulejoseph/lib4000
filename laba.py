@@ -37,9 +37,9 @@ class lib400(QDialog):
         self.cusor.execute('SELECT * FROM students WHERE Id = "str(self.id)"')
         isRecordExist = 0
         for row in self.cusor:
-            isrecordExist = 1
+            isRecordExist = 1
         if (isRecordExist == 1):
-            self.cusor.execute('''UPDATE student SET RegNo ="+self.regno+", Name="+self.name+",
+            self.cusor.execute('''UPDATE students SET RegNo ="+self.regno+", Name="+self.name+",
              Nationality="+self.nationality+", College="+self.college+", Course="+self.course+", Year="+self.year+"
               WHERE Id=?, (str(self.id)) ''')
         else:
@@ -92,7 +92,7 @@ class lib400(QDialog):
 
                 #incrementing sample number by 1
                 self.sampleNum = self.sampleNum+1
-                for self.sampleNum in range(1,10):
+                for self.sampleNum in range(1,21):
                     cv2.imwrite("dataset/user." +str(self.id) +'.'+ str(self.sampleNum) + ".jpg", gray[y:y+h,x:x+w])
 
             return img
@@ -114,6 +114,6 @@ class lib400(QDialog):
 
 app = QApplication(sys.argv)
 window = lib400()
-window.setWindowTitle('kIU lib')
+window.setWindowTitle('KIU lib')
 window.show()
 sys.exit(app.exec_())

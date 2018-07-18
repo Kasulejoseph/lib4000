@@ -1,6 +1,8 @@
 import numpy
 import sys
 import cv2
+import time
+import datetime
 from PyQt5 import QtCore
 from PyQt5.QtCore import pyqtSlot, QTimer
 from PyQt5.QtGui import QPixmap, QImage
@@ -20,21 +22,47 @@ class lib400(QDialog):
         self.font = cv2.FONT_HERSHEY_SIMPLEX
         self.face_Enabled = False
         self.faceCascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
-        self.id =0
+        #self.id =0
+        self.profile= None
 
         self.connection = sqlite3.connect("library.db")
+        self.conn = sqlite3.connect("finance.db")
 
-        self.getdata()
 
-    def getdata(self):
-        cmd = "SELECT * FROM students"
-        cursor = self.connection.execute(cmd)
-        print(cursor.fetchone())
-        data = None
+    def getdata(self, id):
+        self.connection2 = sqlite3.connect("library.db")
+        cmd = "SELECT * FROM individualData WHERE Id ="+str(id)
+        cursor = self.connection2.execute(cmd)
         for row in cursor:
-            data = row
-        return data
-        self.detect_face(data)
+            self.profile = row
+        self.connection2.close()
+
+        return self.profile
+        self.detect_face(self.profile)
+
+    #create a report table
+    def report(self):
+        id=0
+        self.cusor = self.connection.cursor()
+        self.cusor.execute('''CREATE TABLE IF NOT EXISTS report(Id INTEGER , Name TEXT, RegNo TEXT UNIQUE,
+                            Date TEXT)''')
+        self.profile = self.getdata(id)
+        id = self.profile[0]
+        name = self.profile[2]
+        regno = self.profile[1]
+        date = str(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'))
+        self.cusor.execute("SELECT * FROM report WHERE Id="+str(id))
+        isRecordExist = 0
+        for row in self.cusor:
+            isRecordExist = 1
+        if (isRecordExist == 1):
+            self.cusor.execute('''UPDATE OR IGNORE report SET RegNo ="+regno+", Name="+name+",Date="+date+"
+              WHERE Id="+str(id)+" ''')
+        else:
+            self.cusor.execute('''INSERT OR IGNORE INTO report(Id, Name, RegNo, Date)
+            VALUES(?,?,?,?)''', (id, name, regno, date))
+        self.connection.commit()
+
 
 
     def detect_webcam_face(self, status):
@@ -64,33 +92,47 @@ class lib400(QDialog):
         self.image = cv2.flip(self.image, 1)
 
         if (self.face_Enabled):
-            detected_image = self.detect_face(self.image)
+            detected_image = self.detect_face(self.image, self.profile)
             self.displayImage(detected_image,1)
         else:
             self.displayImage(self.image, 2)
 
-    def detect_face(self, img):
-        self.rec.read('recognizer/tranningData.yml')
+    def detect_face(self, img,data):
+        self.rec.read('trainSet/trainingData.yml')
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         faces = self.faceCascade.detectMultiScale(gray, 1.2, 5, minSize=(90,90))
-
+        Id = None
         for(x,y,w,h) in faces:
             cv2.rectangle(img, (x,y), (x+w, y+h), (0,0,255),2)
-            self.id, conf = self.rec.predict(gray[y:y + h, x:x + w])
-            data = self.getdata()
-            if data != None:
-                if Id in data4 == 87:
-                    cv2.putText(img, str(data[2]), (x, y + h + 30), self.font, 2, (0, 0, 255), 2)
-                    cv2.putText(img, str(data[1]), (x, y + h + 30), self.font, 2, (0, 0, 255), 2)
-                    cv2.putText(img, str(data[3]), (x, y + h + 30), self.font, 2, (0, 0, 255), 2)
-                elif Id == 45:
-                    self.id = "matama"
-                    cv2.putText(img, str(data[1]), (x, y + h + 30), self.font, 2, (0, 0, 255), 2)
-                # else:
-                #     self.id = "unknown face"
-                #     cv2.putText(img, str(self.id), (x, y + h + 30), self.font, 2, (0, 0, 255), 2)
-            else:
-                continue
+            Id, conf = self.rec.predict(gray[y:y+y,x:x+w])
+            self.profile = self.getdata(Id)
+            if self.profile != None:
+
+                if Id == 22:
+                    cv2.putText(img, str(self.profile[2]), (x, y + h + 60), self.font, 1, (0, 0, 255), 2)
+                    cv2.putText(img, str(self.profile[1]), (x, y + h + 30), self.font, 1, (0, 0, 255), 2)
+                    cv2.putText(img, str(self.profile[5]), (x, y + h + 90), self.font, 1, (0, 0, 255), 2)
+                    self.report()
+                elif Id == 70:
+                    cv2.putText(img, str(self.profile[2]), (x, y + h + 20), self.font, 1, (0, 0, 255), 2)
+                    cv2.putText(img, str(self.profile[1]), (x, y + h + 120), self.font, 1, (0, 0, 255), 2)
+                    cv2.putText(img, str(self.profile[5]), (x, y + h + 90), self.font, 1, (0, 0, 255), 2)
+                    self.report()
+                elif Id == 765:
+                    cv2.putText(img, str(self.profile[2]), (x, y + h + 60), self.font, 1, (0, 0, 255), 2)
+                    cv2.putText(img, str(self.profile[1]), (x, y + h + 20), self.font, 1, (0, 0, 255), 2)
+                    cv2.putText(img, str(self.profile[5]), (x, y + h + 120), self.font, 1, (0, 0, 255), 2)
+                    self.report()
+                elif Id == 200:
+                    cv2.putText(img, str(self.profile[2]), (x, y + h + 60), self.font, 1, (0, 0, 255), 2)
+                    cv2.putText(img, str(self.profile[1]), (x, y + h + 30), self.font, 1, (0, 0, 255), 2)
+                    cv2.putText(img, str(self.profile[5]), (x, y + h + 90), self.font, 1, (0, 0, 255), 2)
+                    self.report()     
+                else:
+                    cv2.putText(img, "UKNOWN PERSON", (x, y + h + 30), self.font, 2, (0, 0, 255), 2)
+
+           # else:
+                #continue
         return img
         self.connection.close()
 
