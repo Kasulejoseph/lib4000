@@ -4,21 +4,21 @@ import numpy as np
 from PIL import Image
 import sys
 import cv2
-from PyQt5 import QtCore
-from PyQt5.QtCore import pyqtSlot, QTimer
-from PyQt5.QtGui import QPixmap, QImage
-from PyQt5.QtWidgets import QDialog, QApplication, QLineEdit, QInputDialog
-from PyQt5.uic import loadUi
+from PyQt6 import QtCore
+from PyQt6.QtCore import pyqtSlot, QTimer
+from PyQt6.QtGui import QPixmap, QImage
+from PyQt6.QtWidgets import QDialog, QApplication, QLineEdit, QInputDialog
+from PyQt6.uic import loadUi
 import sqlite3
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtCore, QtGui, QtWidgets
 
 ### for trainer ####
 faces = []
 IDS = []
 
-class lib400(QDialog):
+class Library(QDialog):
     def __init__(self):
-        super(lib400, self).__init__()
+        super(Library, self).__init__()
         loadUi('library.ui', self)
         self.image = None
         self.loadimg.clicked.connect(self.loadclicked)
@@ -47,7 +47,7 @@ class lib400(QDialog):
             self.showMessageBox('Warning', 'Invalid Input')
     def showMessageBox(self, title, message):
         msgBox = QtWidgets.QMessageBox()
-        msgBox.setIcon(QtWidgets.QMessageBox.Warning)
+        msgBox.setIcon(QtWidgets.QMessageBox.Icon.Warning)
         msgBox.setWindowTitle(title)
         msgBox.setText(message)
         msgBox.setStandardButtons(QtWidgets.QMessageBox.Ok)
@@ -146,13 +146,13 @@ class lib400(QDialog):
     #####
 
     def displayImage(self, img, window=1):
-        qformat = QImage.Format_Indexed8
+        qformat = QImage.Format.Format_RGB888
 
         if len(img.shape) == 3:
             if img.shape[2] == 4:
-                qformat = QImage.Format_RGBA888
+                qformat = QImage.Format.Format_RGBA888
             else:
-                qformat = QImage.Format_RGB888
+                qformat = QImage.Format.Format_RGB888
         outImage = QImage(img, img.shape[1], img.shape[0], img.strides[0], qformat)
         #BRG>RGB
         outImage = outImage.rgbSwapped()
@@ -162,7 +162,7 @@ class lib400(QDialog):
 
 cv2.destroyAllWindows()
 app = QApplication(sys.argv)
-window = lib400()
+window = Library()
 window.setWindowTitle('KIU lib')
 window.show()
-sys.exit(app.exec_())
+sys.exit(app.exec())

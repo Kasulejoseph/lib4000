@@ -7,18 +7,18 @@
 # WARNING! All changes made in this file will be lost!
 import sqlite3
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtCore, QtGui, QtWidgets
 #import Ui_Signup
-from PyQt5.QtWidgets import QMessageBox
+from PyQt6.QtWidgets import QMessageBox
 
 class Ui_Dialog(object):
     def showMessageBox(self,title, message):
         msgBox = QtWidgets.QMessageBox()
-        msgBox.setIcon(QtWidgets.QMessageBox.Warning)
+        msgBox.setIcon(QtWidgets.QMessageBox.Icon.Warning)
         msgBox.setWindowTitle(title)
         msgBox.setText(message)
-        msgBox.setStandardButtons(QtWidgets.QMessageBox.Ok)
-        msgBox.exec_()
+        msgBox.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Yes)
+        msgBox.exec()
     def signupShow(self):
         self.signUpWindow = QtWidgets.QDialog()
         self.ui = Ui_Signup()
@@ -84,7 +84,7 @@ class Ui_Dialog(object):
         font.setBold(True)
         font.setWeight(75)
         self.label.setFont(font)
-        self.label.setAlignment(QtCore.Qt.AlignCenter)
+        self.label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.label.setObjectName("label")
         ####################
         self.retranslateUi(Dialog)
@@ -159,7 +159,7 @@ class Ui_Signup(object):
         font.setBold(True)
         font.setWeight(75)
         self.label_4.setFont(font)
-        self.label_4.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_4.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.label_4.setObjectName("label_4")
 
         ############################database ###############
@@ -187,7 +187,7 @@ if __name__ == "__main__":
     ui = Ui_Dialog()
     ui.setupUi(Dialog)
     Dialog.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())
 
     ######################################################################################
 

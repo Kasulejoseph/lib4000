@@ -3,14 +3,14 @@ import sys
 import cv2
 import time
 import datetime
-from PyQt5 import QtCore
-from PyQt5.QtCore import pyqtSlot, QTimer
-from PyQt5.QtGui import QPixmap, QImage
-from PyQt5.QtWidgets import QDialog, QApplication, QLineEdit, QInputDialog
-from PyQt5.uic import loadUi
+from PyQt6 import QtCore
+from PyQt6.QtCore import pyqtSlot, QTimer
+from PyQt6.QtGui import QPixmap, QImage
+from PyQt6.QtWidgets import QDialog, QApplication, QLineEdit, QInputDialog
+from PyQt6.uic import loadUi
 import sqlite3
 
-class lib400(QDialog):
+class Recognizer(QDialog):
     def __init__(self):
         super(lib400, self).__init__()
         loadUi('recognize.ui', self)
@@ -137,13 +137,13 @@ class lib400(QDialog):
         self.connection.close()
 
     def displayImage(self, img, window=2):
-        qformat = QImage.Format_Indexed8
+        qformat = QImage.Format.Format_RGB888
 
         if len(img.shape) == 3:
             if img.shape[2] == 4:
-                qformat = QImage.Format_RGBA888
+                qformat = QImage.Format.Format_RGBA888
             else:
-                qformat = QImage.Format_RGB888
+                qformat = QImage.Format.Format_RGB888
         outImage = QImage(img, img.shape[1], img.shape[0], img.strides[0], qformat)
         #BRG>RGB
         outImage = outImage.rgbSwapped()
@@ -152,7 +152,7 @@ class lib400(QDialog):
             self.imglabel.setScaledContents(True)
 
 app = QApplication(sys.argv)
-window = lib400()
+window = Recognizer()
 window.setWindowTitle('Recognition')
 window.show()
-sys.exit(app.exec_())
+sys.exit(app.exec())

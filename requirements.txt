@@ -1,7 +1,12 @@
-numpy==1.14.5
-opencv-contrib-python==3.4.1.15
-opencv-python==3.4.1.15
-Pillow==5.1.0
-pkg-resources==0.0.0
-PyQt5==5.10.1
-sip==4.19.8
+certifi==2023.7.22
+cffi==1.15.1
+numpy==1.26.0
+opencv-contrib-python==4.8.1.78
+opencv-python==4.8.1.78
+packaging @ file:///private/tmp/python-packaging-20230827-10135-o87sk2/packaging-23.1
+Pillow==10.0.1
+protobuf==4.21.12
+pycparser @ file:///private/tmp/pycparser-20230831-5825-v2kl0l/pycparser-2.21
+PyQt6==6.5.2
+PyQt6-Qt6==6.5.2
+PyQt6-sip==13.5.2
