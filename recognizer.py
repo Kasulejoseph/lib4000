@@ -12,7 +12,7 @@ import sqlite3
 
 class Recognizer(QDialog):
     def __init__(self):
-        super(lib400, self).__init__()
+        super(Recognizer, self).__init__()
         loadUi('recognize.ui', self)
         self.image = None
         self.loadimg.clicked.connect(self.loadclicked)
@@ -29,39 +29,39 @@ class Recognizer(QDialog):
         self.conn = sqlite3.connect("finance.db")
 
 
-    def getdata(self, id):
-        self.connection2 = sqlite3.connect("library.db")
-        cmd = "SELECT * FROM individualData WHERE Id ="+str(id)
-        cursor = self.connection2.execute(cmd)
-        for row in cursor:
-            self.profile = row
-        self.connection2.close()
+    # def getdata(self, id):
+    #     self.connection2 = sqlite3.connect("library.db")
+    #     cmd = "SELECT * FROM individualData WHERE Id ="+str(id)
+    #     cursor = self.connection2.execute(cmd)
+    #     for row in cursor:
+    #         self.profile = row
+    #     self.connection2.close()
 
-        return self.profile
-        self.detect_face(self.profile)
+    #     return self.profile
+        # self.detect_face(self.profile)
 
     #create a report table
-    def report(self):
-        id=0
-        self.cusor = self.connection.cursor()
-        self.cusor.execute('''CREATE TABLE IF NOT EXISTS report(Id INTEGER , Name TEXT, RegNo TEXT UNIQUE,
-                            Date TEXT)''')
-        self.profile = self.getdata(id)
-        id = self.profile[0]
-        name = self.profile[2]
-        regno = self.profile[1]
-        date = str(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'))
-        self.cusor.execute("SELECT * FROM report WHERE Id="+str(id))
-        isRecordExist = 0
-        for row in self.cusor:
-            isRecordExist = 1
-        if (isRecordExist == 1):
-            self.cusor.execute('''UPDATE OR IGNORE report SET RegNo ="+regno+", Name="+name+",Date="+date+"
-              WHERE Id="+str(id)+" ''')
-        else:
-            self.cusor.execute('''INSERT OR IGNORE INTO report(Id, Name, RegNo, Date)
-            VALUES(?,?,?,?)''', (id, name, regno, date))
-        self.connection.commit()
+    # def report(self):
+    #     id=0
+    #     self.cusor = self.connection.cursor()
+    #     self.cusor.execute('''CREATE TABLE IF NOT EXISTS report(Id INTEGER , Name TEXT, RegNo TEXT UNIQUE,
+    #                         Date TEXT)''')
+    #     self.profile = self.getdata(id)
+    #     id = self.profile[0]
+    #     name = self.profile[2]
+    #     regno = self.profile[1]
+    #     date = str(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'))
+    #     self.cusor.execute("SELECT * FROM report WHERE Id="+str(id))
+    #     isRecordExist = 0
+    #     for row in self.cusor:
+    #         isRecordExist = 1
+    #     if (isRecordExist == 1):
+    #         self.cusor.execute('''UPDATE OR IGNORE report SET RegNo ="+regno+", Name="+name+",Date="+date+"
+    #           WHERE Id="+str(id)+" ''')
+    #     else:
+    #         self.cusor.execute('''INSERT OR IGNORE INTO report(Id, Name, RegNo, Date)
+    #         VALUES(?,?,?,?)''', (id, name, regno, date))
+    #     self.connection.commit()
 
 
 
@@ -80,6 +80,7 @@ class Recognizer(QDialog):
         self.cap = cv2.VideoCapture(0)
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+        self.update_frame()
 
 
         self.timer = QTimer(self)
@@ -90,6 +91,8 @@ class Recognizer(QDialog):
         # capture frame by frame
         ret, self.image = self.cap.read()
         self.image = cv2.flip(self.image, 1)
+        print("heeeere", self.image)
+
 
         if (self.face_Enabled):
             detected_image = self.detect_face(self.image, self.profile)
@@ -105,7 +108,7 @@ class Recognizer(QDialog):
         for(x,y,w,h) in faces:
             cv2.rectangle(img, (x,y), (x+w, y+h), (0,0,255),2)
             Id, conf = self.rec.predict(gray[y:y+y,x:x+w])
-            self.profile = self.getdata(Id)
+            self.profile = None
             if self.profile != None:
 
                 if Id == 22:
@@ -134,7 +137,7 @@ class Recognizer(QDialog):
            # else:
                 #continue
         return img
-        self.connection.close()
+        # self.connection.close()
 
     def displayImage(self, img, window=2):
         qformat = QImage.Format.Format_RGB888

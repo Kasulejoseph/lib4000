@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+            function handleClick() {
+                fetch("http://localhost:5000/start_camera").then(async(res) => {
+                console.log("then 1", await res.json())
+                }).catch((e) => {
+                console.log("catch 2", e)
+                })
+            }
+    </script>
+    <button onclick="handleClick()" type="button">Click</button>
+</body>
+</html>
